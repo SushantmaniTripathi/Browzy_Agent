@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browzy — New Tab</title>
+  <style>
+    :root {
+      --bg: #05060c;
+      --fg: #f6f6ef;
+      --muted: #a2a5b8;
+      --faint: #767a90;
+      --accent: #e3f24d;
+      --accent-ink: #12140a;
+      --glass: rgba(255, 255, 255, 0.07);
+      --glass-strong: rgba(255, 255, 255, 0.11);
+      --line: rgba(255, 255, 255, 0.14);
+      --radius-pill: 999px;
+      --font: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      color: var(--fg);
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Space scene ------------------------------------------------------- */
+    .scene {
+      position: fixed;
+      inset: 0;
+      background: #05060c url("space.svg") center / cover no-repeat;
+      z-index: 0;
+    }
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(80% 60% at 50% 42%, rgba(5, 6, 12, 0) 0%, rgba(5, 6, 12, 0.35) 70%, rgba(5, 6, 12, 0.8) 100%),
+        linear-gradient(to bottom, rgba(5, 6, 12, 0.55) 0%, rgba(5, 6, 12, 0) 28%);
+    }
+
+    /* Top bar ----------------------------------------------------------- */
+    .top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 28px;
+    }
+
+    .clock {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-pill);
+      backdrop-filter: blur(16px);
+    }
+    .clock::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(227, 242, 77, 0.85);
+    }
+
+    .ask-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--fg);
+      padding: 9px 16px 9px 13px;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      backdrop-filter: blur(18px);
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .ask-badge:hover {
+      background: var(--glass-strong);
+      border-color: rgba(227, 242, 77, 0.45);
+      transform: translateY(-1px);
+    }
+    .ask-badge:active { transform: translateY(0) scale(0.98); }
+    .ask-badge .spark { color: var(--accent); font-size: 13px; line-height: 1; }
+    .ask-badge kbd {
+      font-family: inherit;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 3px 6px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    /* Stage ------------------------------------------------------------- */
+    .stage {
+      position: relative;
+      z-index: 1;
+      width: min(700px, 100% - 48px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translateY(-4vh);
+      animation: rise 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(calc(-4vh + 14px)); }
+      to { opacity: 1; transform: translateY(-4vh); }
+    }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 60px;
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 1;
+      text-shadow: 0 6px 40px rgba(120, 160, 255, 0.28);
+      margin-bottom: 14px;
+    }
+    .wordmark .dot {
+      width: 11px;
+      height: 11px;
+      margin-top: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 22px rgba(227, 242, 77, 0.9);
+    }
+
+    .tagline {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 440px;
+      margin-bottom: 34px;
+    }
+
+    /* Search ------------------------------------------------------------ */
+    .search {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 8px 8px 22px;
+      background: rgba(255, 255, 255, 0.075);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-pill);
+      backdrop-filter: blur(26px) saturate(140%);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+    .search:focus-within {
+      background: rgba(255, 255, 255, 0.095);
+      border-color: rgba(227, 242, 77, 0.5);
+      box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(227, 242, 77, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .search-icon {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      color: var(--faint);
+      display: grid;
+      place-items: center;
+    }
+
+    .search input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 0;
+      font: 15.5px/1.4 var(--font);
+      color: var(--fg);
+      background: transparent;
+      border: 0;
+      outline: none;
+    }
+    .search input::placeholder { color: var(--faint); }
+
+    .search button {
+      flex: 0 0 auto;
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      color: var(--accent-ink);
+      background: var(--accent);
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 6px 22px rgba(227, 242, 77, 0.3);
+      transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+    .search button:hover {
+      background: #f2ff71;
+      transform: scale(1.05);
+      box-shadow: 0 8px 28px rgba(227, 242, 77, 0.42);
+    }
+    .search button:active { transform: scale(0.96); }
+    .search button svg { width: 19px; height: 19px; }
+
+    /* Shortcuts --------------------------------------------------------- */
+    .shortcuts {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 24px;
+    }
+
+    .shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: var(--radius-pill);
+      padding: 8px 15px;
+      backdrop-filter: blur(16px);
+      transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .shortcut .pip {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pip, var(--accent));
+      box-shadow: 0 0 8px var(--pip, var(--accent));
+    }
+    .shortcut:hover {
+      color: var(--fg);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+
+    /* Hint -------------------------------------------------------------- */
+    .hint {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      text-align: center;
+      font-size: 11px;
+      color: var(--faint);
+    }
+    .hint kbd {
+      font-family: inherit;
+      font-size: 10px;
+      padding: 2px 5px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 640px) {
+      .top { padding: 16px; }
+      .wordmark { font-size: 44px; }
+      .search { padding-left: 18px; }
+      .search input { font-size: 14px; }
+      .hint { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="clock" id="clock">—</div>
+    <button id="ask-browzy" class="ask-badge" type="button" title="Open the Browzy side panel (Alt+B)">
+      <span class="spark">✦</span>
+      Ask Browzy
+      <kbd>ALT B</kbd>
+    </button>
+  </header>
+
+  <main class="stage">
+    <h1 class="wordmark">Browzy<span class="dot"></span></h1>
+    <p class="tagline">
+      Your browser with a local AI at the helm. Ask it to open, search, and play —
+      it drives the page in front of you.
+    </p>
+
+    <form class="search" id="search-form" role="search" autocomplete="off">
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M20 20l-3.2-3.2"></path>
+        </svg>
+      </span>
+      <input id="q" name="q" type="text" placeholder="Search the web or type a URL"
+             autofocus aria-label="Search the web or enter a URL">
+      <button type="submit" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h13"></path>
+          <path d="M12 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </form>
+
+    <nav class="shortcuts" aria-label="Shortcuts">
+      <a class="shortcut" href="https://github.com/" style="--pip:#c9d1d9"><span class="pip"></span>GitHub</a>
+      <a class="shortcut" href="https://mail.google.com/" style="--pip:#ea4335"><span class="pip"></span>Gmail</a>
+      <a class="shortcut" href="https://www.youtube.com/" style="--pip:#ff4d4d"><span class="pip"></span>YouTube</a>
+      <a class="shortcut" href="https://news.ycombinator.com/" style="--pip:#ff8c42"><span class="pip"></span>Hacker News</a>
+      <a class="shortcut" href="https://www.wikipedia.org/" style="--pip:#e8e8e8"><span class="pip"></span>Wikipedia</a>
+      <a class="shortcut" href="https://duckduckgo.com/" style="--pip:#7ee0a8"><span class="pip"></span>DuckDuckGo</a>
+    </nav>
+  </main>
+
+  <div class="hint">
+    <kbd>Alt</kbd> + <kbd>B</kbd> opens the Browzy panel · or use the toolbar button
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>

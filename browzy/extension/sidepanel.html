@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browzy - Ask Panel</title>
+    <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+    <div id="browzy-panel" class="browzy-panel" data-theme="dark">
+        <!-- Panel Header -->
+        <header class="panel-header">
+            <div class="header-left">
+                <span class="panel-title">Browzy</span>
+                <span class="panel-tag">Local AI</span>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="btn btn-ghost" aria-label="Toggle theme">
+                    <span class="theme-icon light">☀</span>
+                    <span class="theme-icon dark">◐</span>
+                </button>
+                <button id="close-panel" class="btn btn-ghost" aria-label="Close panel">×</button>
+            </div>
+        </header>
+
+        <!-- Tab Bar -->
+        <nav class="tab-bar" role="tablist">
+            <button id="tab-ask" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-ask">
+                Ask
+            </button>
+            <button id="tab-data" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-data">
+                Your Data
+            </button>
+        </nav>
+
+        <!-- Tab Panels -->
+        <div class="tab-panels">
+            <!-- Ask Tab -->
+            <div id="panel-ask" class="tab-panel active" role="tabpanel">
+                <!-- Connection Status -->
+                <div id="connection-status" class="connection-status disconnected" aria-live="polite">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
+
+                <!-- Past Memories / History Section -->
+                <section id="history-section" class="history-section collapsed" aria-labelledby="history-title">
+                    <header class="section-header">
+                        <h3 id="history-title" class="section-title">Past Memories</h3>
+                        <div class="section-actions">
+                            <button id="new-chat" class="btn btn-ghost btn-sm" title="Start a new conversation" aria-label="Start a new conversation">+</button>
+                            <button id="history-toggle" class="btn btn-ghost btn-sm" aria-expanded="false" aria-controls="history-list" aria-label="Show past memories">
+                                <span class="toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </header>
+                    <div id="history-list" class="history-list">
+                        <div class="history-empty">
+                            <span class="empty-icon">💭</span>
+                            <p class="empty-text">No past conversations yet</p>
+                            <span class="empty-hint">Your chat history will appear here</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chat Messages -->
+                <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                    <div class="message system">
+                        <div class="message-content">
+                            Ask anything — or tell me to open a site, search, or play a video.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions" aria-label="Quick actions">
+                    <button class="quick-action" type="button" data-prompt="Summarize the page I'm on.">Summarize page</button>
+                    <button class="quick-action" type="button" data-action="fill-form">Fill this form</button>
+                    <button class="quick-action" type="button" data-prompt="Compare prices for the cheapest iPhone.">Compare prices</button>
+                    <button class="quick-action" type="button" data-prompt="Open YouTube and play the first Minecraft video.">Play a video</button>
+                    <button class="quick-action" type="button" data-prompt="Read the page and tell me what I can do here.">Read page</button>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <textarea
+                            id="chat-input"
+                            class="input chat-input"
+                            placeholder="Ask Browzy anything..."
+                            rows="1"
+                            aria-label="Chat input"
+                        ></textarea>
+                        <button
+                            id="mic-btn"
+                            class="btn mic-btn"
+                            type="button"
+                            aria-label="Speak in Hindi, Marathi or English"
+                            aria-pressed="false"
+                            title="Speak in Hindi, Marathi or English — click to start, click to stop"
+                        >
+                            <svg class="mic-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="9" y="2.5" width="6" height="11.5" rx="3"></rect>
+                                <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path>
+                                <path d="M12 18v3.5"></path>
+                            </svg>
+                            <span class="mic-spinner" aria-hidden="true"></span>
+                        </button>
+                        <button id="send-btn" class="btn btn-primary" aria-label="Send message">⏎</button>
+                    </div>
+                    <div id="voice-status" class="voice-status" role="status" aria-live="polite" hidden></div>
+                    <div class="input-hints">
+                        <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line
+                        <span class="hint-sep">·</span>
+                        <span class="voice-hint">🎤 हिंदी · मराठी · English</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Data Tab -->
+            <div id="panel-data" class="tab-panel" role="tabpanel">
+                <div class="vault-scroll">
+                    <section class="vault-section">
+                        <header class="section-header">
+                            <h3 class="section-title">Data vault</h3>
+                            <span id="vault-count" class="badge badge-info">Empty</span>
+                        </header>
+                        <div id="vault-dropzone" class="vault-dropzone" role="button" tabindex="0"
+                             aria-label="Upload a document to extract your details">
+                            <div class="vault-drop-icon">⇪</div>
+                            <p class="vault-drop-title">Upload a document</p>
+                            <p class="vault-drop-hint">
+                                PDF, DOCX, TXT or a scan (PNG/JPG). Browzy reads it locally,
+                                keeps only the fields, and deletes the file.
+                            </p>
+                            <input id="vault-file" type="file" hidden
+                                   accept=".pdf,.docx,.doc,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff">
+                        </div>
+                        <div id="vault-status" class="vault-status" aria-live="polite"></div>
+                        <div id="vault-sources" class="vault-sources"></div>
+                    </section>
+
+                    <section class="vault-section">
+                        <header class="section-header">
+                            <h3 class="section-title">Form on this page</h3>
+                            <span id="form-state" class="badge">Checking…</span>
+                        </header>
+                        <button id="fill-page-btn" class="btn btn-primary btn-block" type="button" disabled>
+                            Fill this form
+                        </button>
+                        <p id="fill-hint" class="vault-hint">
+                            Open a signup or checkout form and Browzy will fill it from your vault.
+                        </p>
+                    </section>
+
+                    <section class="vault-section">
+                        <header class="section-header">
+                            <h3 class="section-title">Saved fields</h3>
+                            <button id="clear-vault" class="btn btn-ghost btn-sm" type="button">Clear</button>
+                        </header>
+                        <div id="vault-fields" class="vault-fields">
+                            <div class="vault-empty">No data yet — upload a document above.</div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="sidepanel.js"></script>
+</body>
+</html>

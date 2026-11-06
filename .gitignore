@@ -1,0 +1,29 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Local configuration and runtime data
+.env
+.env.*
+!.env.example
+*.db
+uploads/
+data/
+
+# Browser/runtime state
+runtime/chrome/
+runtime/chrome/UserData/
+runtime/chrome/UserData_*/
+
+# Editor and OS files
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.log
+Thumbs.db
+Desktop.ini
