@@ -1,5 +1,5 @@
 # Browzy
-Browzy is a Chromium extension with a FastAPI backend and optional local Ollama
+Browzy is a Chromium based Browser with built in extension with a FastAPI backend Runs on local Models
 integration.
 
 ## Browser task architecture
