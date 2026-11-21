@@ -1,5 +1,4 @@
 # Browzy
-
 Browzy is a Chromium extension with a FastAPI backend and optional local Ollama
 integration.
 
@@ -45,7 +44,7 @@ Git.
 For local chat, install Ollama and pull a supported model, for example:
 
 ```powershell
-ollama pull llama3.2:3b
+ollama pull qwen3:4b
 ```
 
 ## Project layout
